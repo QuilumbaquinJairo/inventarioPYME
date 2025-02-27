@@ -13,9 +13,24 @@ export class InventarioController {
   async getInventarioById(@Param('id') id: number): Promise<InventarioResponseDto> {
     return this.inventarioService.findInventarioById(id);
   }
+
+  @Get(':id/alertas')
+  findLowStock(@Param('id') id: number) {
+    return this.inventarioService.findLowStockProducts(+id);
+  }
+
   @Post()
   async createInventario(@Body() dto: CreateInventarioDto): Promise<Inventario> {
     return this.inventarioService.createInventario(dto);
+  }
+  
+  @Post(':id_inventario/producto/:id_producto')
+  async addProduct(
+    @Param('id_inventario') id_inventario: number,
+    @Param('id_producto') id_producto: number,
+    @Body('cantidad') cantidad: number,
+  ) {
+    return this.inventarioService.addProductToInventario(id_inventario, id_producto, cantidad);
   }
 
   @Put(':id')
