@@ -34,6 +34,9 @@ export class Producto {
 
   @Column({ default: 0 }) // Matches DEFAULT 0 in SQL
   stock_maximo: number;
+  
+  @Column({ default: 0 }) // ✅ NEW COLUMN for tracking actual stock
+  stock_actual: number;
 
   @ManyToOne(() => Empresa, empresa => empresa.id_empresa, { onDelete: 'CASCADE', nullable: false }) // Ensures id_empresa is NOT NULL
   @JoinColumn({ name: 'id_empresa' })
