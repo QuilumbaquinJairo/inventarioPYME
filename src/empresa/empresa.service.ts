@@ -28,4 +28,10 @@ export class EmpresaService {
     const nuevaEmpresa = this.empresaRepository.create(dto);
     return this.empresaRepository.save(nuevaEmpresa);
   }
+
+  async getAllEmpresas(): Promise<Empresa[]> {
+    return this.empresaRepository.find(); // ✅ Fetch all empresas
+  }
+
+
 }
