@@ -71,16 +71,13 @@ export class UsuarioService {
     }
 
     if (dto.password) {
-      dto.password = await bcrypt.hash(dto.password, 10);
+      user.password_hash = await bcrypt.hash(dto.password, 10);
       delete dto.password; 
     }
 
-    await this.usuarioRepository.update(id, dto);
-    const updatedUser = await this.usuarioRepository.findOne({ where: { id_usuario: id } });
-    if (!updatedUser) {
-      throw new NotFoundException(`User with ID ${id} not found.`);
-    }
-    return updatedUser;
+    Object.assign(user, dto);
+
+    return await this.usuarioRepository.save(user);
   }
 
   async deleteUsuario(id: number): Promise<void> {
