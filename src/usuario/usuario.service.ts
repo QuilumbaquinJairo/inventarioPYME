@@ -96,4 +96,12 @@ export class UsuarioService {
       throw new BadRequestException(`Cannot delete user with ID ${id}, it may be linked to other records.`);
     }
   }
+
+  async findAllUsuarios(): Promise<Usuario[]> {
+    return this.usuarioRepository.find({
+      relations: ['empresa', 'roles'], // ✅ Fetch related data
+      order: { fecha_creacion: 'DESC' }, // ✅ Sort by newest users first
+    });
+  }
+  
 }

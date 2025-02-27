@@ -8,6 +8,11 @@ import { UpdateUsuarioDto } from './dto/update-usuario.dto';
 export class UsuarioController {
   constructor(private readonly usuarioService: UsuarioService) {}
 
+  @Get()
+  async getAllUsuarios(): Promise<Usuario[]> {
+    return this.usuarioService.findAllUsuarios();
+  }
+  
   @Get(':id')
   async getUserById(@Param('id') id: number): Promise<Usuario> {
     return this.usuarioService.findById(id);
