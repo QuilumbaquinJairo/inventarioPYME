@@ -23,7 +23,7 @@ export class AuthService {
     console.log(`✅ User found: ${user.email}, checking password...`);
     console.log(`🔑 Retrieved Password Hash: "${user.password_hash}"`);
     console.log(`🔑 dto Password Hash: "${loginDto.password}"`);
-    const isPasswordValid = bcrypt.compareSync(loginDto.password, user.password_hash);
+    const isPasswordValid = await bcrypt.compare(loginDto.password, user.password_hash);
     if (!isPasswordValid) {
       console.log(`❌ Password does not match`);
       return null;

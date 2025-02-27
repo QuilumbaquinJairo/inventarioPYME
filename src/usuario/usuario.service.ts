@@ -52,17 +52,25 @@ export class UsuarioService {
       }
     }
 
+    // ✅ Ensure password exists and hash it
+    if (!dto.password) {
+        throw new BadRequestException(`❌ Password is required.`);
+    }
+    
+    const hashedPassword = await bcrypt.hash(dto.password, 10); // ✅ Secure password hashing
+
     // ✅ Create new user
     const newUser = this.usuarioRepository.create({
       nombre_completo: dto.nombre_completo,
       email: dto.email,
       telefono: dto.telefono,
-      password_hash: await bcrypt.hash(dto.password, 10), // Hash password
+      password_hash: hashedPassword, // ✅ Correctly store the hashed password
       empresa, // 🔥 Use relation, not `id_empresa`
     });
 
     return this.usuarioRepository.save(newUser);
-  }
+}
+
   async updateUsuario(id: number, dto: UpdateUsuarioDto): Promise<Usuario> {
     const user = await this.usuarioRepository.findOne({ where: { id_usuario: id } });
 

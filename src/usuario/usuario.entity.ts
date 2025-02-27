@@ -40,8 +40,4 @@ export class Usuario {
     inverseJoinColumn: { name: 'id_rol', referencedColumnName: 'id_rol' }
   })
   roles: Rol[];
-  @BeforeInsert()
-  async hashPassword() {
-    this.password_hash = await bcrypt.hash(this.password_hash, 10);
-  }
 }
