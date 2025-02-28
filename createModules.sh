@@ -3,6 +3,11 @@ nest generate controller proveedor
 nest generate service proveedor
 echo "module proveedor created"
 
+nest generate module usuario-rol
+nest generate controller usuario-rol
+nest generate service usuario-rol
+echo "module usuario-rol created"
+
 nest generate module reporte
 nest generate controller reporte
 nest generate service reporte
