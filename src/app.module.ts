@@ -17,6 +17,7 @@ import { AlertaStockModule } from './alerta-stock/alerta-stock.module';
 import { PedidoModule } from './pedido/pedido.module';
 import { DetallePedidoModule } from './detalle-pedido/detalle-pedido.module';
 import { JwtModule } from '@nestjs/jwt';
+import { UsuarioRolModule } from './usuario-rol/usuario-rol.module';
 
 @Module({
   imports: [
@@ -29,7 +30,7 @@ import { JwtModule } from '@nestjs/jwt';
       password: process.env.DATABASE_PASSWORD,
       database: process.env.DATABASE_NAME,
       entities: [__dirname + '/**/*.entity{.ts,.js}'],
-    }), EmpresaModule, UsuarioModule, RolModule, ProductoModule, CategoriaModule, InventarioModule, MovimientoInventarioModule, AuthModule, ProveedorModule, ReporteModule, AlertaStockModule, PedidoModule, DetallePedidoModule,
+    }), EmpresaModule, UsuarioModule, RolModule, ProductoModule, CategoriaModule, InventarioModule, MovimientoInventarioModule, AuthModule, ProveedorModule, ReporteModule, AlertaStockModule, PedidoModule, DetallePedidoModule, UsuarioRolModule,
   ],
   controllers: [AppController],
   providers: [AppService],
