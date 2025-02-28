@@ -13,4 +13,6 @@ export class RolService {
   async findAll(): Promise<Rol[]> {
     return this.rolRepository.find();
   }
+
+  
 }

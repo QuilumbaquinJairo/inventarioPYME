@@ -1,5 +1,6 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToMany, JoinTable } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, ManyToMany, JoinTable,OneToMany } from 'typeorm';
 import { Usuario } from '../usuario/usuario.entity';
+import { UsuarioRol } from '../usuario-rol/usuario-rol.entity';
 
 @Entity()
 export class Rol {
@@ -15,4 +16,7 @@ export class Rol {
   @ManyToMany(() => Usuario, usuario => usuario.roles)
   @JoinTable({ name: 'Usuario_Rol' }) // Explicitly define the join table
   usuarios: Usuario[];
+
+  @OneToMany(() => UsuarioRol, usuarioRol => usuarioRol.rol)
+  usuarioRoles: UsuarioRol[];
 }
