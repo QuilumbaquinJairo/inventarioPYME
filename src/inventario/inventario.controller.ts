@@ -9,6 +9,11 @@ import { InventarioResponseDto } from './dto/inventario-response.dto';
 export class InventarioController {
   constructor(private readonly inventarioService: InventarioService) {}
 
+  @Get()
+  async getAllInventarios(): Promise<Inventario[]> {
+    return this.inventarioService.getAllInventarios();
+  }
+
   @Get(':id')
   async getInventarioById(@Param('id') id: number): Promise<InventarioResponseDto> {
     return this.inventarioService.findInventarioById(id);
@@ -18,6 +23,19 @@ export class InventarioController {
   findLowStock(@Param('id') id: number) {
     return this.inventarioService.findLowStockProducts(+id);
   }
+  
+  @Get('stock/:id_inventario')
+  async getStockByInventario(@Param('id_inventario') id_inventario: number): Promise<{ stock_total: number }> {
+    const stock_total = await this.inventarioService.getStockTotalByInventario(id_inventario);
+    return { stock_total };
+  }
+
+  @Get('stock-global')
+  async getStockGlobal(): Promise<{ stock_total_global: number }> {
+    const stock_total_global = await this.inventarioService.getStockTotalGlobal();
+    return { stock_total_global };
+  }
+
 
   @Post()
   async createInventario(@Body() dto: CreateInventarioDto): Promise<Inventario> {

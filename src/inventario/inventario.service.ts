@@ -64,8 +64,6 @@ export class InventarioService {
       productos_stock: productosStock, // ✅ No duplicates, correct stock
     };
   }
-  
-  
 
   async findLowStockProducts(id: number) {
     const inventario = await this.inventarioRepository.findOne({
@@ -94,7 +92,6 @@ export class InventarioService {
       productos_stock: lowStockProducts, // ✅ Only low-stock products
     };
   }
-  
 
   async createInventario(dto: CreateInventarioDto): Promise<Inventario> {
     const newInventario = this.inventarioRepository.create({
@@ -170,6 +167,39 @@ export class InventarioService {
     await this.productoRepository.save(producto);
   
     return movimiento;
+  }
+
+  async getStockTotalByInventario(id_inventario: number): Promise<number> {
+    const inventario = await this.inventarioRepository.findOne({ where: { id_inventario } });
+
+    if (!inventario) {
+      throw new NotFoundException(`Inventario con ID ${id_inventario} no encontrado.`);
+    }
+
+    const totalStock = await this.productoRepository
+      .createQueryBuilder('producto')
+      .innerJoin('movimiento_inventario', 'mov', 'mov.id_producto = producto.id_producto')
+      .where('mov.id_inventario = :id_inventario', { id_inventario })
+      .select('SUM(producto.stock_actual)', 'totalStock')
+      .getRawOne();
+
+    return totalStock?.totalStock || 0;
+  }
+
+  async getStockTotalGlobal(): Promise<number> {
+    const totalStock = await this.productoRepository
+      .createQueryBuilder('producto')
+      .select('SUM(producto.stock_actual)', 'totalStock')
+      .getRawOne();
+
+    return totalStock?.totalStock || 0;
+  }
+  
+  async getAllInventarios(): Promise<Inventario[]> {
+    return this.inventarioRepository.find({
+      relations: ['empresa'], // Include Empresa details in the response
+      order: { fecha_actualizacion: 'DESC' }, // Sort by latest updates
+    });
   }
   
 
