@@ -1,7 +1,7 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, ManyToMany, JoinTable,JoinColumn, BeforeInsert } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, ManyToMany, JoinTable,JoinColumn, OneToMany } from 'typeorm';
 import { Empresa } from '../empresa/empresa.entity';
 import { Rol } from '../rol/rol.entity';
-import * as bcrypt from 'bcryptjs';
+import { UsuarioRol } from '../usuario-rol/usuario-rol.entity';
 
 @Entity()
 export class Usuario {
@@ -40,4 +40,7 @@ export class Usuario {
     inverseJoinColumn: { name: 'id_rol', referencedColumnName: 'id_rol' }
   })
   roles: Rol[];
+
+  @OneToMany(() => UsuarioRol, usuarioRol => usuarioRol.usuario)
+  usuarioRoles: UsuarioRol[];
 }

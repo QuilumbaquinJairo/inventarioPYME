@@ -1,11 +1,13 @@
 import { Injectable, NotFoundException,BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 import { Usuario } from './usuario.entity';
 import { Empresa } from '../empresa/empresa.entity';
 import { CreateUsuarioDto } from './dto/create-usuario.dto';
 import { UpdateUsuarioDto } from './dto/update-usuario.dto';
 import * as bcrypt from 'bcryptjs';
+import { UsuarioRol } from '../usuario-rol/usuario-rol.entity';
+import { Rol } from '../rol/rol.entity';
 
 @Injectable()
 export class UsuarioService {
@@ -13,7 +15,11 @@ export class UsuarioService {
     @InjectRepository(Usuario)
     public readonly usuarioRepository: Repository<Usuario>,
     @InjectRepository(Empresa)
-    private readonly empresaRepository: Repository<Empresa>
+    private readonly empresaRepository: Repository<Empresa>,
+    @InjectRepository(Rol)
+    private readonly rolRepository: Repository<Rol>,
+    @InjectRepository(UsuarioRol)
+    private readonly usuarioRolRepository: Repository<UsuarioRol>,
   ) {}
 
   async findByEmail(email: string): Promise<Usuario | null> {
@@ -29,6 +35,12 @@ export class UsuarioService {
     if (!user) {
       throw new NotFoundException(`User with ID ${id} not found`);
     }
+    const usuarioRoles = await this.usuarioRolRepository.find({
+      where: { id_usuario: id },
+      relations: ['rol'],
+    });
+
+    user.roles = usuarioRoles.map(ur => ur.rol);
 
     return user;
   }
@@ -67,8 +79,22 @@ export class UsuarioService {
       password_hash: hashedPassword, // ✅ Correctly store the hashed password
       empresa, // 🔥 Use relation, not `id_empresa`
     });
+    
+    const savedUser = await this.usuarioRepository.save(newUser);
 
-    return this.usuarioRepository.save(newUser);
+    // ✅ Assign roles if provided
+    if (dto.id_roles && dto.id_roles.length > 0) {
+      const roles = await this.rolRepository.findBy({ id_rol: In(dto.id_roles) }); // ✅ Use `findBy({ id_rol: In([...]) })`
+      
+      if (roles.length !== dto.id_roles.length) {
+        throw new BadRequestException(`❌ Some roles do not exist.`);
+      }
+  
+      const usuarioRoles = roles.map(rol => this.usuarioRolRepository.create({ usuario: savedUser, rol }));
+      await this.usuarioRolRepository.save(usuarioRoles);
+    }
+  
+    return savedUser;
 }
 
   async updateUsuario(id: number, dto: UpdateUsuarioDto): Promise<Usuario> {
@@ -103,10 +129,29 @@ export class UsuarioService {
   }
 
   async findAllUsuarios(): Promise<Usuario[]> {
-    return this.usuarioRepository.find({
-      relations: ['empresa', 'roles'], // ✅ Fetch related data
-      order: { fecha_creacion: 'DESC' }, // ✅ Sort by newest users first
+    const usuarios = await this.usuarioRepository.find({
+      relations: ['empresa'], // ✅ Fetch Empresa relation
+      order: { fecha_creacion: 'DESC' },
     });
+    
+    const usuarioRoles = await this.usuarioRolRepository.find({
+      where: { id_usuario: In(usuarios.map(u => u.id_usuario)) },
+      relations: ['rol'],
+    });
+
+    const rolesMap = new Map<number, Rol[]>();
+    usuarioRoles.forEach(ur => {
+      if (!rolesMap.has(ur.id_usuario)) {
+        rolesMap.set(ur.id_usuario, []);
+      }
+      rolesMap.get(ur.id_usuario)?.push(ur.rol);
+    });
+
+    usuarios.forEach(usuario => {
+      usuario.roles = rolesMap.get(usuario.id_usuario) || [];
+    });
+
+    return usuarios;
   }
   
 }

@@ -19,4 +19,7 @@ export class CreateUsuarioDto {
 
   @IsOptional()
   id_empresa?: number;
+  
+  @IsOptional()
+  id_roles?: number[];
 }

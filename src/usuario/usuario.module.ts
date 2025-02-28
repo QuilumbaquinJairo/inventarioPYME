@@ -4,12 +4,17 @@ import { Usuario } from './usuario.entity';
 import { Empresa } from '../empresa/empresa.entity'; // ✅ Import Empresa
 import { UsuarioService } from './usuario.service';
 import { UsuarioController } from './usuario.controller';
-import { EmpresaModule } from '../empresa/empresa.module'; // ✅ Import EmpresaModule
+import { EmpresaModule } from '../empresa/empresa.module';
+import { RolModule } from '../rol/rol.module';
+import { UsuarioRolModule } from '../usuario-rol/usuario-rol.module';
+
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([Usuario]), // ✅ Load UsuarioRepository
-    EmpresaModule, // ✅ Import EmpresaModule so EmpresaRepository is available
+    EmpresaModule, 
+    RolModule,
+    UsuarioRolModule,
   ],
   controllers: [UsuarioController],
   providers: [UsuarioService],
